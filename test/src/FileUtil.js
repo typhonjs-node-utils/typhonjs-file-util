@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 import fs         from 'fs-extra';
+import path       from 'path';
 
 import FileUtil   from '../../src/FileUtil.js';
 
@@ -84,10 +85,14 @@ describe('FileUtil:', () =>
       // Glob upgrade for bare path / all inclusive
       let { files, globs } = fileUtil.hydrateGlob('./test/fixture');
 
+      files = files.map((file) => path.parse(file).base);
+
       assert.strictEqual(JSON.stringify(files), globVerifyFiles);
       assert.strictEqual(JSON.stringify(globs), globVerifyGlobs);
 
       ({ files, globs } = fileUtil.hydrateGlob(['./test/fixture/*.gz', './test/fixture/*.js']));
+
+      files = files.map((file) => path.parse(file).base);
 
       assert.strictEqual(JSON.stringify(files), globVerifyFiles);
       assert.strictEqual(JSON.stringify(globs), globVerifyGlobs2);
@@ -127,7 +132,7 @@ const readLineData =
 10|    }`;
 
 
-const globVerifyFiles = '["/Volumes/Data/program/web/projects/TyphonJS/repos/typhonrt/typhonjs-node-utils/typhonjs-file-util/test/fixture/archive.tar.gz","/Volumes/Data/program/web/projects/TyphonJS/repos/typhonrt/typhonjs-node-utils/typhonjs-file-util/test/fixture/archive2.tar.gz","/Volumes/Data/program/web/projects/TyphonJS/repos/typhonrt/typhonjs-node-utils/typhonjs-file-util/test/fixture/test.js","/Volumes/Data/program/web/projects/TyphonJS/repos/typhonrt/typhonjs-node-utils/typhonjs-file-util/test/fixture/test2.js","/Volumes/Data/program/web/projects/TyphonJS/repos/typhonrt/typhonjs-node-utils/typhonjs-file-util/test/fixture/test3.js"]';
+const globVerifyFiles = '["archive.tar.gz","archive2.tar.gz","test.js","test2.js","test3.js"]';
 const globVerifyGlobs = '["./test/fixture/**/*"]';
 
 const globVerifyGlobs2 = '["./test/fixture/*.gz","./test/fixture/*.js"]';
