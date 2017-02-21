@@ -9,6 +9,9 @@ const fileUtil = new FileUtil({ relativePath: './test/fixture' });
 // Empty test fixture directory.
 fs.emptydirSync('./test/fixture');
 
+// Note: to prevent `./test/fixture` from being emptied at the end of testing comment out the last test
+// `emptyRelativePath`.
+
 describe('FileUtil:', () =>
 {
    it('writeFile:', () =>
@@ -105,6 +108,19 @@ describe('FileUtil:', () =>
       assert.throws(() => fileUtil.hydrateGlob(['string', true]));
    });
 
+   // This test will remove all files from `./test/fixture`.
+   it('emptyRelativePath:', () =>
+   {
+      let files = fs.readdirSync('./test/fixture');
+
+      assert.lengthOf(files, 5);
+
+      fileUtil.emptyRelativePath();
+
+      files = fs.readdirSync('./test/fixture');
+
+      assert.lengthOf(files, 0);
+   });
 });
 
 const writeData =

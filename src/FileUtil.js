@@ -28,7 +28,7 @@ export default class FileUtil
          compressFormat: 'tar.gz',
          eventbus: null,
          lockRelative: false,
-         logEvent: 'log:info:raw',
+         logEvent: 'log:debug',
          relativePath: null
       };
 
@@ -189,6 +189,33 @@ export default class FileUtil
    }
 
    /**
+    * Empties the resolved relative directory if one is set and it is different from the current working directory.
+    */
+   emptyRelativePath()
+   {
+      if (this._options.relativePath)
+      {
+         const resolvedPath = path.resolve(this._options.relativePath);
+
+         // Do not empty path if resolvedPath is at or below the current working directory.
+         if (process.cwd().startsWith(resolvedPath))
+         {
+            s_LOG(this._options, `FileUtil.emptyRelativePath: aborting as current working directory will be deleted.`);
+         }
+         else
+         {
+            s_LOG(this._options, `emptying: ${this._options.relativePath}`);
+
+            fs.emptyDirSync(path.resolve(this._options.relativePath));
+         }
+      }
+      else
+      {
+         s_LOG(this._options, 'FileUtil.emptyRelativePath: no relative path to empty.');
+      }
+   }
+
+   /**
     * Copy a source path / to destination path or relative path.
     *
     * @param {string}   srcPath - Source path.
@@ -324,15 +351,17 @@ export default class FileUtil
          if (typeof options.eventPrepend === 'string') { eventPrepend = `${options.eventPrepend}:`; }
       }
 
-      eventbus.on(`${eventPrepend}util:file:hydrate:glob`, this.hydrateGlob, this);
-
       eventbus.on(`${eventPrepend}util:file:archive:create`, this.archiveCreate, this);
 
       eventbus.on(`${eventPrepend}util:file:archive:finalize`, this.archiveFinalize, this);
 
       eventbus.on(`${eventPrepend}util:file:copy`, this.copy, this);
 
+      eventbus.on(`${eventPrepend}util:file:empty:relative:path`, this.emptyRelativePath, this);
+
       eventbus.on(`${eventPrepend}util:file:get:options`, this.getOptions, this);
+
+      eventbus.on(`${eventPrepend}util:file:hydrate:glob`, this.hydrateGlob, this);
 
       eventbus.on(`${eventPrepend}util:file:read:lines`, this.readLines, this);
 
