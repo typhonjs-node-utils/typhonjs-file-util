@@ -5,14 +5,14 @@ import isGlob     from 'is-glob';
 import path       from 'path';
 
 /**
- * FileUtil
+ * FileUtil - Provides several utility methods for archiving, copying, reading, and writing files.
  */
 export default class FileUtil
 {
    /**
-    * Instantiate FileUtil
+    * Instantiate FileUtil.
     *
-    * @param {FileUtilOptions}  options -
+    * @param {FileUtilOptions}  options - FileUtilOptions to set.
     */
    constructor(options = {})
    {
@@ -33,7 +33,7 @@ export default class FileUtil
       };
 
       /**
-       *
+       * Stores the stack of archiver instances.
        * @type {Array}
        */
       this.archiverStack = [];
@@ -48,9 +48,8 @@ export default class FileUtil
    }
 
    /**
-    * Helper event binding to create a compressed archive relative to the output destination. All subsequent file
-    * write and copy operations will add to the existing archive. You must invoke 'typhonjs:util:file:archive:finalize' to
-    * complete the archive process.
+    * Create a compressed archive relative to the output destination. All subsequent file write and copy operations
+    * will add to the existing archive. You must invoke `archiveFinalize` to complete the archive process.
     *
     * @param {string}   destPath - Destination path and file name; the compress format extension will be appended.
     *
@@ -61,6 +60,10 @@ export default class FileUtil
     */
    archiveCreate(destPath, addToParent = true, silent = false)
    {
+      if (typeof destPath !== 'string') { throw new TypeError(`'destPath' is not a 'string'.`); }
+      if (typeof addToParent !== 'boolean') { throw new TypeError(`'addToParent' is not a 'boolean'.`); }
+      if (typeof silent !== 'boolean') { throw new TypeError(`'silent' is not a 'boolean'.`); }
+
       if (typeof silent === 'boolean' && !silent) { s_LOG(this._options, `creating archive: ${destPath}`); }
 
       const compressFormat = this._options.compressFormat;
@@ -71,8 +74,8 @@ export default class FileUtil
       let resolvedDest = this._options.relativePath ? path.resolve(this._options.relativePath, destPath) :
        path.resolve(destPath);
 
-      // If a child archive is being created, `addToParent` is true and `config.separateDataFiles` is false then
-      // change the resolved destination to a temporary file so that the parent instance can add it before finalizing.
+      // If a child archive is being created, `addToParent` is false then change the resolved destination to a
+      // temporary file so that the parent instance can add it before finalizing.
       if (this.archiverStack.length > 0 && addToParent)
       {
          const dirName = path.dirname(resolvedDest);
@@ -122,12 +125,16 @@ export default class FileUtil
    }
 
    /**
-    * Helper event binding to finalize an active archive. You must first invoke 'typhonjs:util:file:archive:create'.
+    * Finalizes an active archive. You must first invoke `archiveCreate`.
     *
     * @param {boolean}  [silent=false] - When true `output: <destPath>` is logged.
+    *
+    * @returns {Promise} - A resolved promise is returned which is triggered once archive finalization completes.
     */
    archiveFinalize(silent = false)
    {
+      if (typeof silent !== 'boolean') { throw new TypeError(`'silent' is not a 'boolean'.`); }
+
       const instance = this._popArchive();
 
       if (instance !== null)
@@ -157,7 +164,7 @@ export default class FileUtil
          }
 
          // Resolve any child promises before finalizing current instance.
-         Promise.all(instance.childPromises).then((results) =>
+         return Promise.all(instance.childPromises).then((results) =>
          {
             // There are temporary child archives to insert into the current instance.
             for (const result of results)
@@ -177,17 +184,25 @@ export default class FileUtil
       {
          s_LOG(this._options, `No active archive to finalize.`);
       }
+
+      return Promise.resolve();
    }
 
    /**
-    * Helper event binding to copy a source path / file relative to the output destination.
+    * Copy a source path / to destination path or relative path.
     *
     * @param {string}   srcPath - Source path.
+    *
     * @param {string}   destPath - Destination path.
+    *
     * @param {boolean}  [silent=false] - When true `output: <destPath>` is logged.
     */
    copy(srcPath, destPath, silent = false)
    {
+      if (typeof srcPath !== 'string') { throw new TypeError(`'srcPath' is not a 'string'.`); }
+      if (typeof destPath !== 'string') { throw new TypeError(`'destPath' is not a 'string'.`); }
+      if (typeof silent !== 'boolean') { throw new TypeError(`'silent' is not a 'boolean'.`); }
+
       if (typeof silent === 'boolean' && !silent) { s_LOG(this._options, `output: ${destPath}`); }
 
       const instance = this._getArchive();
@@ -231,8 +246,7 @@ export default class FileUtil
    }
 
    /**
-    * Looks up a glob or bare path entry in `config` via `globEntry` then hydrates a list of files finally
-    * storing any generated modification back to the accessor entries.
+    * Hydrates a list of files finally defined as globs. Bare directory paths will be converted to globs.
     *
     * @param {string|Array<string>} globs - A string or array of strings defining file globs. Any entry which is not
     *                                       a glob will be converted to an all inclusive glob.
@@ -248,6 +262,16 @@ export default class FileUtil
 
       // If not an array then convert globEntry to an array.
       const globArray = Array.isArray(globs) ? globs : [globs];
+
+      // Verify that all entries are strings.
+      for (let cntr = 0; cntr < globArray.length; cntr++)
+      {
+         if (typeof globArray[cntr] !== 'string')
+         {
+            throw new TypeError(`'globs[${cntr}]: '${globArray[cntr]}' is not a 'string'.`);
+         }
+      }
+
       const actualGlobs = [];
 
       // Process glob array and if any entry is not a glob then convert it to an all inclusive glob.
@@ -277,7 +301,7 @@ export default class FileUtil
    }
 
    /**
-    * Adds event bindings for FileUtil.
+    * Adds event bindings for FileUtil via `typhonjs-plugin-manager`.
     *
     * @param {PluginEvent} ev - A plugin event.
     */
@@ -328,15 +352,22 @@ export default class FileUtil
    }
 
    /**
-    * Helper event binding to read lines from a file given a start and end line number.
+    * Read lines from a file given a start and end line number.
     *
     * @param {string}   filePath - The file path to load.
+    *
     * @param {number}   lineStart - The start line
+    *
     * @param {number}   lineEnd - The end line
+    *
     * @returns {String[]}
     */
    readLines(filePath, lineStart, lineEnd)
    {
+      if (typeof filePath !== 'string') { throw new TypeError(`'filePath' is not a 'string'.`); }
+      if (typeof lineStart !== 'number') { throw new TypeError(`'lineStart' is not a 'number'.`); }
+      if (typeof lineEnd !== 'number') { throw new TypeError(`'lineEnd' is not a 'number'.`); }
+
       const lines = fs.readFileSync(filePath).toString().split('\n');
       const targetLines = [];
 
@@ -377,27 +408,38 @@ export default class FileUtil
    }
 
    /**
-    * Helper event binding to output a file relative to the output destination.
+    * Write a file to file path or relative path.
     *
     * @param {object}   fileData - The file data.
-    * @param {string}   fileName - A relative file path and name to `config.destination`.
+    *
+    * @param {string}   filePath - A relative file path and name to `config.destination`.
+    *
     * @param {boolean}  [silent=false] - When true `output: <destPath>` is logged.
-    * @param {encoding} [encoding=utf8] - The encoding type.
+    *
+    * @param {string}   [encoding=utf8] - The encoding type.
     */
-   writeFile(fileData, fileName, silent = false, encoding = 'utf8')
+   writeFile(fileData, filePath, silent = false, encoding = 'utf8')
    {
-      if (typeof silent === 'boolean' && !silent) { s_LOG(this._options, `output: ${fileName}`); }
+      if (typeof filePath !== 'string') { throw new TypeError(`'filePath' is not a 'string'.`); }
+      if (typeof silent !== 'boolean') { throw new TypeError(`'silent' is not a 'boolean'.`); }
+      if (typeof encoding !== 'string') { throw new TypeError(`'encoding' is not a 'string'.`); }
+      if (typeof fileData === 'undefined' || fileData === null)
+      {
+         throw new TypeError(`'filePath' is not a 'string'.`);
+      }
+
+      if (typeof silent === 'boolean' && !silent) { s_LOG(this._options, `output: ${filePath}`); }
 
       const instance = this._getArchive();
 
       if (instance !== null)
       {
-         instance.archive.append(fileData, { name: fileName });
+         instance.archive.append(fileData, { name: filePath });
       }
       else
       {
-         // If this._options.relativePath is defined then resolve the relative path against fileName.
-         fs.outputFileSync(this._options.relativePath ? path.resolve(this._options.relativePath, fileName) : fileName,
+         // If this._options.relativePath is defined then resolve the relative path against filePath.
+         fs.outputFileSync(this._options.relativePath ? path.resolve(this._options.relativePath, filePath) : filePath,
           fileData, { encoding });
       }
    }
@@ -407,6 +449,8 @@ export default class FileUtil
  * Creates an instance of FileUtil and assigns several methods to the plugin eventbus.
  *
  * @param {PluginEvent}    ev - A plugin event.
+ *
+ * @ignore
  */
 export function onPluginLoad(ev)
 {
@@ -419,7 +463,10 @@ export function onPluginLoad(ev)
  * Helper method to log a message over an eventbus if one is defined.
  *
  * @param {FileUtilOptions}   options - FileUtil options.
+ *
  * @param {*}                 message - A message to log.
+ *
+ * @ignore
  */
 const s_LOG = (options, message) =>
 {
