@@ -1,4 +1,4 @@
-![typhonjs-file-util](http://i.imgur.com/2sy9PUs.png)
+![typhonjs-file-util](https://i.imgur.com/khXUOwW.png)
 
 [![NPM](https://img.shields.io/npm/v/typhonjs-file-util.svg?label=npm)](https://www.npmjs.com/package/typhonjs-file-util)
 [![Documentation](http://docs.typhonjs.io/typhonjs-node-utils/typhonjs-file-util/badge.svg)](http://docs.typhonjs.io/typhonjs-node-utils/typhonjs-file-util/)
