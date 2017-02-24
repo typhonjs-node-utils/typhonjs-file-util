@@ -14,7 +14,7 @@ fs.emptydirSync('./test/fixture');
 
 describe('FileUtil:', () =>
 {
-   it('writeFile:', () =>
+   it('writeFile', () =>
    {
       fileUtil.writeFile(writeData, 'test.js');
       fileUtil.writeFile(writeData, 'test2.js');
@@ -29,14 +29,43 @@ describe('FileUtil:', () =>
       assert.strictEqual(readData2, writeData);
    });
 
-   it('readLines:', () =>
+   it('readLines', () =>
    {
       const readLines = fileUtil.readLines('./test/fixture/test.js', 2, 10);
 
       assert.strictEqual(readLines.join('\n'), readLineData);
    });
 
-   it('copy:', () =>
+   it('commonPath', () =>
+   {
+      const paths =
+      [
+         '/this/is/a/test/path/one/file.js',
+         '/this/is/a/test/path/one/file2.js',
+         '/this/is/a/test/path/two/file3.js',
+         '/this/is/a/test/path/two/file4.js',
+         '/this/is/a/test/path/three/file5.js'
+      ];
+
+      const relativePaths =
+      [
+         '../../../this/is/a/test/path/one/file.js',
+         '../../../this/is/a/test/path/one/file2.js',
+         '../../this/is/a/test/path/two/file3.js',
+         '../../this/is/a/test/path/two/file4.js',
+         '../../this/is/a/test/path/three/file5.js'
+      ];
+
+      let commonPath = fileUtil.commonPath(...paths);
+
+      assert.strictEqual(commonPath, '/this/is/a/test/path/');
+
+      commonPath = fileUtil.commonPath(...relativePaths);
+
+      assert.strictEqual(commonPath, '../../');
+   });
+
+   it('copy', () =>
    {
       fileUtil.copy('./test/fixture/test.js', 'test3.js');
 
@@ -47,7 +76,7 @@ describe('FileUtil:', () =>
       assert.strictEqual(readData, writeData);
    });
 
-   it('create archive (1):', () =>
+   it('create archive (1)', () =>
    {
       fileUtil.archiveCreate('archive');
 
@@ -60,7 +89,7 @@ describe('FileUtil:', () =>
       assert.isTrue(fs.existsSync('./test/fixture/archive.tar.gz'));
    });
 
-   it('create archive (2):', (done) =>
+   it('create archive (2)', (done) =>
    {
       fileUtil.archiveCreate('archive2');
 
@@ -83,7 +112,7 @@ describe('FileUtil:', () =>
       });
    });
 
-   it('hydrateGlobs:', () =>
+   it('hydrateGlobs', () =>
    {
       // Glob upgrade for bare path / all inclusive
       let { files, globs } = fileUtil.hydrateGlob('./test/fixture');
@@ -101,7 +130,7 @@ describe('FileUtil:', () =>
       assert.strictEqual(JSON.stringify(globs), globVerifyGlobs2);
    });
 
-   it('hydrateGlobs (throws):', () =>
+   it('hydrateGlobs (throws)', () =>
    {
       assert.throws(() => fileUtil.hydrateGlob());
       assert.throws(() => fileUtil.hydrateGlob(true));
@@ -109,7 +138,7 @@ describe('FileUtil:', () =>
    });
 
    // This test will remove all files from `./test/fixture`.
-   it('emptyRelativePath:', () =>
+   it('emptyRelativePath', () =>
    {
       let files = fs.readdirSync('./test/fixture');
 
