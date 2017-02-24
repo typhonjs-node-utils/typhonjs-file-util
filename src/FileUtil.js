@@ -218,7 +218,7 @@ export default class FileUtil
    /**
     * Finds the common base path of a collection of paths.
     *
-    * @param {string}   paths - Paths to find a common base path.
+    * @param {string[]} paths - Paths to find a common base path.
     *
     * @returns {string}
     */
@@ -231,6 +231,58 @@ export default class FileUtil
       for (let i = 0; i < paths.length; i++)
       {
          folders.push(paths[i].split('/'));        // Split on file separator.
+      }
+
+      for (let j = 0; j < folders[0].length; j++)
+      {
+         const thisFolder = folders[0][j];         // Assign the next folder name in the first path.
+         let allMatched = true;                    // Assume all have matched in case there are no more paths.
+
+         for (let i = 1; i < folders.length && allMatched; i++)   // Look at the other paths.
+         {
+            if (folders[i].length < j)             // If there is no folder here.
+            {
+               allMatched = false;                 // No match.
+               break;                              // Reached end of folders.
+            }
+
+            allMatched &= folders[i][j] === thisFolder; // Check if it matched.
+         }
+
+         if (allMatched)                           // If they all matched this folder name.
+         {
+            commonPath += `${thisFolder}/`;        // Add it to the common path.
+         }
+         else
+         {
+            break;                                 // Stop looking
+         }
+      }
+
+      return commonPath;
+   }
+
+   /**
+    * Finds the common base path of a collection of paths.
+    *
+    * @param {string}   key - A key to index into each object.
+    *
+    * @param {object[]} objects - Objects containing a key to holding a path.
+    *
+    * @returns {string}
+    */
+   commonMappedPath(key, ...objects)
+   {
+      let commonPath = '';
+
+      const folders = [];
+
+      for (let i = 0; i < objects.length; i++)
+      {
+         if (typeof objects[i][key] === 'string')
+         {
+            folders.push(objects[i][key].split('/')); // Split on file separator.
+         }
       }
 
       for (let j = 0; j < folders[0].length; j++)
@@ -403,6 +455,8 @@ export default class FileUtil
       eventbus.on(`${eventPrepend}util:file:archive:finalize`, this.archiveFinalize, this);
 
       eventbus.on(`${eventPrepend}util:file:common:path`, this.commonPath, this);
+
+      eventbus.on(`${eventPrepend}util:file:common:mapped:path`, this.commonMappedPath, this);
 
       eventbus.on(`${eventPrepend}util:file:copy`, this.copy, this);
 
