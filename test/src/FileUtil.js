@@ -63,6 +63,10 @@ describe('FileUtil:', () =>
       commonPath = fileUtil.commonPath(...relativePaths);
 
       assert.strictEqual(commonPath, '../../');
+
+      commonPath = fileUtil.commonPath([]);
+
+      assert.strictEqual(commonPath, '');
    });
 
    it('commonMappedPath', () =>
@@ -92,6 +96,10 @@ describe('FileUtil:', () =>
       commonPath = fileUtil.commonMappedPath('path', ...relativePaths);
 
       assert.strictEqual(commonPath, '../../');
+
+      commonPath = fileUtil.commonMappedPath('path', []);
+
+      assert.strictEqual(commonPath, '');
    });
 
    it('copy', () =>

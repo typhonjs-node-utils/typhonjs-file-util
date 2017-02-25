@@ -224,14 +224,21 @@ export default class FileUtil
     */
    commonPath(...paths)
    {
+      if (!Array.isArray(paths)) { throw new TypeError(`'paths' is not an 'array'.`); }
+
       let commonPath = '';
 
       const folders = [];
 
       for (let i = 0; i < paths.length; i++)
       {
-         folders.push(paths[i].split('/'));        // Split on file separator.
+         if (typeof paths[i] === 'string')
+         {
+            folders.push(paths[i].split('/'));     // Split on file separator.
+         }
       }
+
+      if (folders.length === 0) { return commonPath; }
 
       for (let j = 0; j < folders[0].length; j++)
       {
@@ -267,23 +274,28 @@ export default class FileUtil
     *
     * @param {string}   key - A key to index into each object.
     *
-    * @param {object[]} objects - Objects containing a key to holding a path.
+    * @param {object[]} map - Objects containing a key to holding a path.
     *
     * @returns {string}
     */
-   commonMappedPath(key, ...objects)
+   commonMappedPath(key, ...map)
    {
+      if (typeof key !== 'string') { throw new TypeError(`'key' is not a 'string'.`); }
+      if (!Array.isArray(map)) { throw new TypeError(`'map' is not an 'array'.`); }
+
       let commonPath = '';
 
       const folders = [];
 
-      for (let i = 0; i < objects.length; i++)
+      for (let i = 0; i < map.length; i++)
       {
-         if (typeof objects[i][key] === 'string')
+         if (typeof map[i][key] === 'string')
          {
-            folders.push(objects[i][key].split('/')); // Split on file separator.
+            folders.push(map[i][key].split('/')); // Split on file separator.
          }
       }
+
+      if (folders.length === 0) { return commonPath; }
 
       for (let j = 0; j < folders[0].length; j++)
       {
