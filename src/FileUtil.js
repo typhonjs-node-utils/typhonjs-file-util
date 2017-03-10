@@ -466,21 +466,21 @@ export default class FileUtil
 
       eventbus.on(`${eventPrepend}util:file:archive:finalize`, this.archiveFinalize, this);
 
-      eventbus.on(`${eventPrepend}util:file:common:path`, this.commonPath, this);
-
-      eventbus.on(`${eventPrepend}util:file:common:mapped:path`, this.commonMappedPath, this);
-
       eventbus.on(`${eventPrepend}util:file:copy`, this.copy, this);
 
-      eventbus.on(`${eventPrepend}util:file:empty:relative:path`, this.emptyRelativePath, this);
+      eventbus.on(`${eventPrepend}util:file:glob:hydrate`, this.hydrateGlob, this);
 
-      eventbus.on(`${eventPrepend}util:file:get:options`, this.getOptions, this);
+      eventbus.on(`${eventPrepend}util:file:lines:read`, this.readLines, this);
 
-      eventbus.on(`${eventPrepend}util:file:hydrate:glob`, this.hydrateGlob, this);
+      eventbus.on(`${eventPrepend}util:file:options:get`, this.getOptions, this);
 
-      eventbus.on(`${eventPrepend}util:file:read:lines`, this.readLines, this);
+      eventbus.on(`${eventPrepend}util:file:options:set`, this.setOptions, this);
 
-      eventbus.on(`${eventPrepend}util:file:set:options`, this.setOptions, this);
+      eventbus.on(`${eventPrepend}util:file:path:common`, this.commonPath, this);
+
+      eventbus.on(`${eventPrepend}util:file:path:common:mapped`, this.commonMappedPath, this);
+
+      eventbus.on(`${eventPrepend}util:file:path:relative:empty`, this.emptyRelativePath, this);
 
       eventbus.on(`${eventPrepend}util:file:write`, this.writeFile, this);
    }
