@@ -11,13 +11,14 @@ fs.emptydirSync('./test/fixture');
 
 // Note: to prevent `./test/fixture` from being emptied at the end of testing comment out the last test
 // `emptyRelativePath`.
+//   writeFile({ fileData, filePath, silent = false, encoding = 'utf8' } = {})
 
 describe('FileUtil:', () =>
 {
    it('writeFile', () =>
    {
-      fileUtil.writeFile(writeData, 'test.js');
-      fileUtil.writeFile(writeData, 'test2.js');
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test.js' });
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test2.js' });
 
       assert.isTrue(fs.existsSync('./test/fixture/test.js'));
       assert.isTrue(fs.existsSync('./test/fixture/test2.js'));
@@ -104,7 +105,7 @@ describe('FileUtil:', () =>
 
    it('copy', () =>
    {
-      fileUtil.copy('./test/fixture/test.js', 'test3.js');
+      fileUtil.copy({ srcPath: './test/fixture/test.js', destPath: 'test3.js' });
 
       assert.isTrue(fs.existsSync('./test/fixture/test3.js'));
 
@@ -115,11 +116,11 @@ describe('FileUtil:', () =>
 
    it('create archive (1)', () =>
    {
-      fileUtil.archiveCreate('archive');
+      fileUtil.archiveCreate({ filePath: 'archive' });
 
-      fileUtil.writeFile(writeData, 'test3.js');
-      fileUtil.writeFile(writeData, 'test4.js');
-      fileUtil.copy('./test/fixture/test.js', 'test.js');
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test3.js' });
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test4.js' });
+      fileUtil.copy({ srcPath: './test/fixture/test.js', destPath: 'test.js' });
 
       fileUtil.archiveFinalize();
 
@@ -128,17 +129,17 @@ describe('FileUtil:', () =>
 
    it('create archive (2)', (done) =>
    {
-      fileUtil.archiveCreate('archive2');
+      fileUtil.archiveCreate({ filePath: 'archive2' });
 
-      fileUtil.writeFile(writeData, 'test3.js');
-      fileUtil.writeFile(writeData, 'test4.js');
-      fileUtil.copy('./test/fixture/test.js', 'test.js');
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test3.js' });
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test4.js' });
+      fileUtil.copy({ srcPath: './test/fixture/test.js', destPath: 'test.js' });
 
-      fileUtil.archiveCreate('archive');
+      fileUtil.archiveCreate({ filePath: 'archive' });
 
-      fileUtil.writeFile(writeData, 'test3.js');
-      fileUtil.writeFile(writeData, 'test4.js');
-      fileUtil.copy('./test/fixture/test.js', 'test.js');
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test3.js' });
+      fileUtil.writeFile({ fileData: writeData, filePath: 'test4.js' });
+      fileUtil.copy({ srcPath: './test/fixture/test.js', destPath: 'test.js' });
 
       fileUtil.archiveFinalize();
 
