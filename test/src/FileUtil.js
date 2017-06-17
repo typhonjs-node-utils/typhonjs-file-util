@@ -32,7 +32,7 @@ describe('FileUtil:', () =>
 
    it('readLines', () =>
    {
-      const readLines = fileUtil.readLines('./test/fixture/test.js', 2, 10);
+      const readLines = fileUtil.readLines({ filePath: './test/fixture/test.js', lineStart: 2, lineEnd: 10 });
 
       assert.strictEqual(readLines.join('\n'), readLineData);
    });
