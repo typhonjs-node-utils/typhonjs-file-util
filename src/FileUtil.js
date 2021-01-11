@@ -139,7 +139,7 @@ export default class FileUtil
     *
     * @returns {Promise} - A resolved promise is returned which is triggered once archive finalization completes.
     */
-   archiveFinalize({ logPrepend = '', silent = false } = {})
+   async archiveFinalize({ logPrepend = '', silent = false } = {})
    {
       if (typeof silent !== 'boolean') { throw new TypeError(`'silent' is not a 'boolean'.`); }
 
@@ -172,8 +172,10 @@ export default class FileUtil
          }
 
          // Resolve any child promises before finalizing current instance.
-         return Promise.all(instance.childPromises).then((results) =>
+         await Promise.all(instance.childPromises).then((results) =>
          {
+            console.log(`FileUtil - AF - Promise.all - results: ${JSON.stringify(results)}`);
+
             // There are temporary child archives to insert into the current instance.
             for (const result of results)
             {
@@ -183,10 +185,25 @@ export default class FileUtil
                // Remove temporary archive.
                fs.removeSync(result.resolvedPath);
             }
-
-            // finalize the archive (ie we are done appending files but streams have to finish yet)
-            instance.archive.finalize();
          });
+
+         // Create a promise for current instance stream to close.
+         const promise = new Promise((resolve, reject) =>
+         {
+            // Add event callbacks to instance stream such that on close the Promise is resolved.
+            instance.stream.on('close', () =>
+            {
+               resolve();
+            });
+
+            // Any errors will reject the promise.
+            instance.stream.on('error', reject);
+         });
+
+         // finalize the archive (ie we are done appending files but streams have to finish yet)
+         instance.archive.finalize();
+
+         return promise;
       }
       else
       {

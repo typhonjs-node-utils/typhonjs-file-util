@@ -18,11 +18,11 @@
     "test-coverage": "babel-node ./node_modules/typhonjs-npm-scripts-test-mocha/scripts/mocha-istanbul.js"
   },
   "dependencies": {
-    "archiver": "^1.0.0",
+    "archiver": "^5.0.0",
     "babel-runtime": "^6.0.0",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "^9.0.0",
     "glob": "^7.0.0",
-    "is-glob": "^3.0.0"
+    "is-glob": "^4.0.0"
   },
   "devDependencies": {
     "typhonjs-config-eslint": "^0.4.0",

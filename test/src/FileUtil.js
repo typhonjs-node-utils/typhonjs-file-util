@@ -122,9 +122,10 @@ describe('FileUtil:', () =>
       fileUtil.writeFile({ fileData: writeData, filePath: 'test4.js' });
       fileUtil.copy({ srcPath: './test/fixture/test.js', destPath: 'test.js' });
 
-      fileUtil.archiveFinalize();
-
-      assert.isTrue(fs.existsSync('./test/fixture/archive.tar.gz'));
+      fileUtil.archiveFinalize().then(() =>
+      {
+         assert.isTrue(fs.existsSync('./test/fixture/archive.tar.gz'));
+      });
    });
 
    it('create archive (2)', (done) =>
