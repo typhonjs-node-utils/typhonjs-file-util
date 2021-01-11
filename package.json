@@ -1,6 +1,6 @@
 {
   "name": "typhonjs-file-util",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "description": "Provides several utility methods for archiving, copying, reading, and writing files.",
   "author": "typhonrt",
   "homepage": "https://github.com/typhonjs-node-utils/typhonjs-file-util",
