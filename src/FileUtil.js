@@ -174,8 +174,6 @@ export default class FileUtil
          // Resolve any child promises before finalizing current instance.
          await Promise.all(instance.childPromises).then((results) =>
          {
-            console.log(`FileUtil - AF - Promise.all - results: ${JSON.stringify(results)}`);
-
             // There are temporary child archives to insert into the current instance.
             for (const result of results)
             {

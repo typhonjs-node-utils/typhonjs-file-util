@@ -25,7 +25,7 @@
     "is-glob": "^4.0.0"
   },
   "devDependencies": {
-    "typhonjs-config-eslint": "^0.4.0",
+    "typhonjs-config-eslint": "^0.6.0",
     "typhonjs-npm-build-test": "^0.4.0"
   },
   "keywords": [
