@@ -30,7 +30,7 @@ jobs:
         run: npm install
 
       - name: Run the tests
-        run: npm run test
+        run: npm test
 
   # builds on versions of Node that don't require --experimental-modules nor `esm` to run ESM mocha tests.
   build-node:
@@ -55,7 +55,4 @@ jobs:
         run: npm install
 
       - name: Run Tests
-        run: npm run test
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        run: npm test
